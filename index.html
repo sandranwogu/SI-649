@@ -1,0 +1,898 @@
+<!DOCTYPE html>
+
+<head>
+    <meta charset="utf-8">
+    <script src="./distributions.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/d3/3.5.5/d3.min.js"></script>
+    <script src="https://d3js.org/d3-random.v1.min.js"></script>
+    <script src="https://d3js.org/d3-array.v0.6.min.js"></script>
+    <script src="https://d3js.org/d3.v4.min.js"></script>
+    <style>
+        .ball {
+            fill: #001515;
+            stroke: #97b8d0;
+            stroke-width: 1px;
+        }
+
+        .bar rect {
+            fill: rgba(114, 190, 208, 0.84);
+            fill-opacity: 0.8;
+        }
+
+        .bar text {
+            fill: white;
+        }
+
+        .line {
+            fill: #636363;
+            fill-opacity: 0.2;
+        }
+
+        .axis path {
+            stroke: #636363;
+            stroke-width: 2px;
+        }
+
+        .axis text {
+            fill: #636363;
+        }
+
+        .containers{
+            background-color:#2E4272;
+            display:flex;
+        }
+        .fixed{
+            background-color:#4F628E;
+            width: 200px;
+        }
+        .flex-item{
+            background-color:#7887AB;
+            flex-grow: 1;
+        }
+        svg { width:100%; height: 100% }
+
+        .column {
+            float: left;
+            width: 50%;
+            padding: 15px;
+        }
+
+        .column2 {
+            float: right;
+            width: 50%;
+            padding: 15px;
+        }
+
+        .row:after {
+            content: "";
+            display: table;
+            clear: both;
+        }
+
+        div {
+            width: 1350px;
+            margin: 6px;
+            font-family: Avenir;
+        }
+
+        .header {
+            background-color: rgba(114, 190, 208, 0.33);
+            padding: 20px;
+            text-align: center;
+            width: 1350px;
+        }
+
+
+
+        .btn {
+            color: rgba(30, 22, 54, 0.6);
+            box-shadow: rgba(30, 22, 54, 0.4) 0 0px 0px 1px inset;
+            padding: 9px 8px;
+            cursor: pointer;
+            border: initial;
+
+        }
+
+        .btn:hover {
+            color: rgba(255, 255, 255, 0.85);
+            box-shadow: rgba(114, 190, 208, 0.7) 0 0px 0px 40px inset;
+        }
+
+        .wrap {
+            position: absolute;
+            top: 50%;
+            left: 33%;
+            margin-top: 120px;
+            margin-left: -89px;
+            text-align: center;
+        }
+
+        .wrap2 {
+            position: absolute;
+            top: 50%;
+            left: 33%;
+            margin-top: -227px;
+            margin-left: -89px;
+            text-align: center;
+        }
+
+        .wrap3 {
+            position: absolute;
+            top: 50%;
+            left: 33%;
+            margin-top: -100px;
+            margin-left: -89px;
+            text-align: center;
+        }
+
+        .wrap4 {
+            position: absolute;
+            top: 50%;
+            left: 33%;
+            margin-top: 190px;
+            margin-left: -310px;
+            text-align: center;
+        }
+
+    </style>
+</head>
+
+<body>
+
+<div class="container">
+    <div class="row">
+        <div class="header">
+            <h1>Visualize The Central Limit Theorem</h1>
+        </div>
+    </div>
+</div>
+<div class="row">
+    <div class="column">
+        <h2>Central Limit Theorem</h2>
+        <p>The Central Limit theorem (CLT) is an particularly important cornerstone concept of probability theory that
+            states that if you draw/sample i.i.d random variables multiple times from any distribution and take the mean
+            each time, the sampling distribution of the mean will converge to an approximately normal distribution with
+            mean (μ) and variance σ2/n. The assumption behind the CLT is that this convergence happens as the sample size ‘n’
+            which generates each mean gets sufficiently large.
+            This theorem makes it possible to apply statistical methods that work for normal distributions to any
+            distribution when it is sufficiently large. The CLT holds that the mean and standard deviation of the sampling
+            distribution will be very close to the population mean and standard deviation. </p>
+        <p>
+            This visualization will help understand what the central limit theorem means, and how the sample means of different distributions converges to an approximately normal distribution.
+            The random number drawn is between 0 and 1 and the starting distribution as well as the sample size can be varied using the buttons on the right. Play around with different parameters and notice what happens with a sample
+            size of 4 versus 40, and notice that if you sample enough times, the distribution of the means will start to look normal regardless of starting distribution.
+            below.
+        </p>
+    </div>
+    <div class = wrap2 id="histogram"></div>
+    <div class = "wrap2">
+        <h2>Use buttons below to choose starting distribution</h2>
+    </div>
+    <div class = wrap3>
+        <img style="display:none;" id="bigpic" src="./normal.png" height="200" width="500" border="0"/>
+
+    </div>
+
+
+
+    <div class = column2>
+    <div class = wrap>
+    <div id="buttons">
+        <button id="reset" class="btn btn-default"  onclick="reload()">Reset</button>
+        <button id="normal" class="btn btn-default"  onclick="showPictureN(); fornorm(); showText(); changesample()">Normal Distribution</button>
+        <button id="uniform" class="btn btn-default"  onclick="showPictureU(); forunif(); showText(); changesample()">Uniform Distribution</button>
+        <button id="bates" class="btn btn-default"  onclick="showPictureLn(); forbates(); showText(); changesample()">Bates Distribution</button>
+        <button id="exp" class="btn btn-default"  onclick="showPictureExp(); forexp(); showText(); changesample()">Exponential Distribution</button>
+
+    </div>
+    </div>
+    </div>
+</div>
+<div class="wrap4">
+    <label>n = 4
+        <input type="radio" id = "four" name="radio" onClick="choose('four')">
+    </label>
+
+    <label>n = 40
+        <input type="radio" id = "fourty" name="radio" onClick="choose('fourty')">
+    </label>
+</div>
+    <script>
+
+        function scrollWin() {
+            window.scrollTo(0, 300);
+        }
+        scrollWin();
+
+        function showPictureN() {
+                var sourceOfPicture = "./normal.png";
+                var img = document.getElementById('bigpic');
+                img.src = sourceOfPicture.replace('40x40', '40x40');
+                img.style.display = "inline";
+        }
+
+        function showPictureU() {
+            var sourceOfPicture = "./uniform.png";
+            var img = document.getElementById('bigpic');
+            img.src = sourceOfPicture.replace('40x90', '40x40');
+            img.style.display = "inline";
+        }
+
+        function showPictureLn() {
+            var sourceOfPicture = "./bates.png";
+            var img = document.getElementById('bigpic');
+            img.src = sourceOfPicture.replace('40x90', '40x40');
+            img.style.display = "inline";
+        }
+
+        function showPictureExp() {
+            var sourceOfPicture = "./exponential.png";
+            var img = document.getElementById('bigpic');
+            img.src = sourceOfPicture.replace('40x90', '40x40');
+            img.style.display = "inline";
+        }
+
+
+    </script>
+
+        <div id = "balls" class="flex-item">
+        <script>
+
+            var margin = {
+                top: 20,
+                right: 10,
+                bottom: 20,
+                left: 10
+            };
+            var width = 1500 - margin.left - margin.right,
+                height = 500 - margin.top - margin.bottom;
+
+            var svg = d3.select("body")
+                .append("svg")
+                .attr("width", width + margin.left + margin.right)
+                .attr("height", height + margin.top + margin.bottom)
+                .append("g")
+                .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
+
+            var dt = 680,
+                n = 0,
+                user;// time step
+
+            function choose(choice){
+                user = choice;
+            }
+
+            function changesample(){
+                if (user == 'four') {
+                    n = 4;
+                }
+                else if (user == 'fourty') {
+                    n = 40
+                }
+            }
+
+
+            var f = {
+                sample: d3.randomNormal(0, 1)(),
+                mu: 1 / 2,
+                sigma: 1 / (2 * Math.sqrt(3))
+            };
+
+            var u = {
+                sample: d3.randomUniform(1, 5)(),
+                a: 1,
+                b: 5
+            };
+
+            var ln = {
+                sample: Math.random,
+                mu: 1 / 2,
+                sigma: 1 / (2 * Math.sqrt(3))
+            };
+
+            var exp = {
+                sample: Math.random,
+                lambda: 1/2,
+            };
+
+
+            var pdfnorm = function(x) { return Math.sqrt(n)*Math.exp(-n*(x-f.mu)*(x-f.mu)/(2*f.sigma*f.sigma))/Math.sqrt(2*Math.PI)/f.sigma; };
+            var pdflognorm = function(x) { return (1/x)*Math.sqrt(n)*Math.exp(-n*(Math.log(x)-ln.mu)*(Math.log(x)-ln.mu)/(2*ln.sigma*ln.sigma))/Math.sqrt(2*Math.PI)/ln.sigma; };
+            var pdfunif = function(x) { return 1/(u.b-u.a); };
+            var pdfexp = function (x) {return exp.lambda*Math.exp(-exp.lambda*x);};
+
+            var x = d3.scaleLinear()
+                .domain([0, 1.2])
+                .rangeRound([0, width]);
+
+            var y1 = height / 5,
+                y2 = height / 3;
+
+            var y = d3.scaleLinear()
+                .domain([0, 4])
+                .range([0, height - y2]);
+
+            var histogram = d3.histogram()
+                .domain(x.domain())
+                .thresholds(x.ticks(20));
+
+            var area = d3.area()
+                .x(function(d) {
+                    return x(d[0])
+                })
+                .y0(y2)
+                .y1(function(d) {
+                    return y2 + y(d[1])
+                })
+                .curve(d3.curveBasis);
+
+            svg.append("path").attr("class", "line");
+            svg.append("g").attr("class", "bars");
+
+            var counts1 = [];
+            var counts2 = [];
+            var counts3 = [];
+            var counts4 = [];
+
+            var axis = svg.selectAll(".axis")
+                .data([{
+                    y: 0,
+                    label: "draw"
+                }, {
+                    y: y1,
+                    label: "average"
+                }, {
+                    y: y2,
+                    label: "count"
+                }])
+                .enter().append("g")
+                .attr("class", "axis")
+                .attr("transform", function(d) {
+                    return "translate(0," + d.y + ")";
+                });
+
+            axis.append("path")
+                .attr("d", function(d) {
+                    return "M0,0H" + width;
+                });
+
+            axis.append("text")
+                .attr("dominant-baseline", "hanging")
+                .attr("dy", 5)
+                .text(function(d) {
+                    return d.label;
+                });
+
+            function renderBars() {
+                var data = histogram(counts1)
+                    .map(d => {
+                        d.y = counts1.length > 0 ? d.length / counts1.length : 0;
+                        return d;
+                    })
+                    .filter(d => d.x1 > d.x0);
+
+                var ymax = d3.max(data, function(d) {
+                    return d.y;
+                });
+                y.domain([0, ymax / (1 / 20)]);
+
+                var bar = svg.select(".bars").selectAll(".bar").data(data);
+
+                var g = bar.enter().append("g")
+                    .attr("class", "bar")
+                    .attr("transform", function(d) {
+                        return "translate(" + x(d.x0) + "," + y2 + ")";
+                    });
+
+                g.append("rect")
+                    .attr("width", function(d) {
+                        return (x(d.x1) - x(d.x0)) - 2;
+                    });
+
+                g.append("text")
+                    .attr("x", x(1 / 40))
+                    .attr("dy", 10)
+                    .attr("dominant-baseline", "hanging")
+                    .attr("text-anchor", "middle");
+
+                bar.select("rect").transition().duration(dt / 4)
+                    .attr("height", function(d) {
+                        return y(d.y / (1 / 20));
+                    });
+
+                bar.select("text")
+                    .text(function(d) {
+                        return d.y > 0 ? d3.format(".0%")(d.y) : "";
+                    });
+
+                svg.select(".line").datum(d3.range(0, 1.05, 0.05).map(function(x) {
+                    return [x, pdfnorm(x)];
+                }))
+                    .transition().duration(dt / 4)
+                    .attr("d", area);
+            }
+
+
+
+            function renderBalls() {
+                var data = d3.range(n).map(function(d) {
+                    return d3.randomNormal(f.mu, f.sigma)()
+                });
+                var mean = d3.mean(data);
+
+
+                var ball = svg.append("g").selectAll(".ball").data(data);
+
+                var i = 0;
+                ball.enter().append("circle")
+                    .attr("class", "ball")
+                    .attr("cx", function(d) {
+                        return x(d);
+                    })
+                    .attr("cy", 0)
+                    .attr("r", 5)
+                    .transition().duration(dt).ease(d3.easeBounce)
+                    .attr("cy", y1 - 5)
+                    .on("end", function() {
+                        d3.select(this)
+                            .transition().duration(dt / 4)
+                            .attr("cy", (y2 + y1) / 2)
+                            .transition().duration(dt / 4)
+                            .attr("cx", x(mean))
+                            .transition().duration(dt / 4).ease(d3.easeBounce)
+                            .attr("cy", y2 - 3)
+                            .attr("r", 3)
+                            .each(function() {
+                                ++i;
+                            })
+                            .on("end", function() {
+                                if (!--i) {
+                                    counts1.push(mean);
+                                } else {
+                                    d3.select(this).remove();
+                                }
+                            });
+                    });
+            }
+
+
+
+            function renderBarsunif() {
+                var data = histogram(counts2)
+                    .map(d => {
+                        d.y = counts2.length > 0 ? d.length / counts2.length : 0;
+                        return d;
+                    })
+                    .filter(d => d.x1 > d.x0);
+
+                var ymax = d3.max(data, function(d) {
+                    return d.y;
+                });
+                y.domain([0, ymax / (1 / 20)]);
+
+                var bar = svg.select(".bars").selectAll(".bar")
+                    .data(data);
+
+                var g = bar.enter().append("g")
+                    .attr("class", "bar")
+                    .attr("transform", function(d) {
+                        return "translate(" + x(d.x0) + "," + y2 + ")";
+                    });
+
+                g.append("rect")
+                    .attr("width", function(d) {
+                        return (x(d.x1) - x(d.x0)) - 2;
+                    });
+
+                g.append("text")
+                    .attr("x", x(1 / 40))
+                    .attr("dy", 10)
+                    .attr("dominant-baseline", "hanging")
+                    .attr("text-anchor", "middle");
+
+                bar.select("rect").transition().duration(dt / 4)
+                    .attr("height", function(d) {
+                        return y(d.y / (1 / 20));
+                    });
+
+                bar.select("text")
+                    .text(function(d) {
+                        return d.y > 0 ? d3.format(".0%")(d.y) : "";
+                    });
+
+                svg.select(".line").datum(d3.range(0, 1.05, 0.05).map(function(x) {
+                    return [x, pdfnorm(x)];
+                }))
+                    .transition().duration(dt / 4)
+                    .attr("d", area);
+            }
+
+            function renderBallsunif() {
+                var data = d3.range(n).map(function(d) {
+                    return d3.randomUniform(0, 1)()
+                });
+                var mean = d3.mean(data);
+
+                var ball = svg.append("g").selectAll(".ball")
+                    .data(data);
+
+                var i = 0;
+                ball.enter().append("circle")
+                    .attr("class", "ball")
+                    .attr("cx", function(d) {
+                        return x(d);
+                    })
+                    .attr("cy", 0)
+                    .attr("r", 5)
+                    .transition().duration(dt).ease(d3.easeBounce)
+                    .attr("cy", y1 - 5)
+                    .on("end", function() {
+                        d3.select(this)
+                            .transition().duration(dt / 4)
+                            .attr("cy", (y2 + y1) / 2)
+                            .transition().duration(dt / 4)
+                            .attr("cx", x(mean))
+                            .transition().duration(dt / 4).ease(d3.easeBounce)
+                            .attr("cy", y2 - 3)
+                            .attr("r", 3)
+                            .each(function() {
+                                ++i;
+                            })
+                            .on("end", function() {
+                                if (!--i) {
+                                    counts2.push(mean);
+                                } else {
+                                    d3.select(this).remove();
+                                }
+                            });
+                    });
+            }
+
+
+
+            function renderBarsln() {
+                var data = histogram(counts3)
+                    .map(d => {
+                        d.y = counts3.length > 0 ? d.length / counts3.length : 0;
+                        return d;
+                    })
+                    .filter(d => d.x1 > d.x0);
+
+                var ymax = d3.max(data, function(d) {
+                    return d.y;
+                });
+                y.domain([0, ymax / (1 / 20)]);
+
+                var bar = svg.select(".bars").selectAll(".bar").data(data).transition();
+
+                var g = bar.enter().append("g")
+                    .attr("class", "bar")
+                    .attr("transform", function(d) {
+                        return "translate(" + x(d.x0) + "," + y2 + ")";
+                    });
+
+                g.append("rect")
+                    .attr("width", function(d) {
+                        return (x(d.x1) - x(d.x0)) - 2;
+                    });
+
+                g.append("text")
+                    .attr("x", x(1 / 40))
+                    .attr("dy", 10)
+                    .attr("dominant-baseline", "hanging")
+                    .attr("text-anchor", "middle");
+
+                bar.select("rect").transition().duration(dt / 4)
+                    .attr("height", function(d) {
+                        return y(d.y / (1 / 20));
+                    });
+
+                bar.select("text")
+                    .text(function(d) {
+                        return d.y > 0 ? d3.format(".0%")(d.y) : "";
+                    });
+
+                svg.select(".line").datum(d3.range(0, 1.05, 0.05).map(function(x) {
+                    return [x, pdfnorm(x)];
+                }))
+                    .transition().duration(dt / 4)
+                    .attr("d", area);
+            }
+
+
+            function renderBallsln() {
+                var data = d3.range(n).map(function(d) {
+                    return d3.randomLogNormal()()
+                });
+                var mean = d3.mean(data);
+
+                var ball = svg.append("g").selectAll(".ball").data(data);
+
+                var i = 0;
+                ball.enter().append("circle")
+                    .attr("class", "ball")
+                    .attr("cx", function(d) {
+                        return x(d);
+                    })
+                    .attr("cy", 0)
+                    .attr("r", 5)
+                    .transition().duration(dt).ease(d3.easeBounce)
+                    .attr("cy", y1 - 5)
+                    .on("end", function() {
+                        d3.select(this)
+                            .transition().duration(dt / 4)
+                            .attr("cy", (y2 + y1) / 2)
+                            .transition().duration(dt / 4)
+                            .attr("cx", x(mean))
+                            .transition().duration(dt / 4).ease(d3.easeBounce)
+                            .attr("cy", y2 - 3)
+                            .attr("r", 3)
+                            .each(function() {
+                                ++i;
+                            })
+                            .on("end", function() {
+                                if (!--i) {
+                                    counts3.push(mean);
+                                } else {
+                                    d3.select(this).remove();
+                                }
+                            });
+                    });
+            }
+
+
+            function renderBarsBates() {
+                var data = histogram(counts4)
+                    .map(d => {
+                        d.y = counts4.length > 0 ? d.length / counts4.length : 0;
+                        return d;
+                    })
+                    .filter(d => d.x1 > d.x0);
+
+                var ymax = d3.max(data, function(d) {
+                    return d.y;
+                });
+                y.domain([0, ymax / (1 / 20)]);
+
+                var bar = svg.select(".bars").selectAll(".bar").data(data);
+
+                var g = bar.enter().append("g")
+                    .attr("class", "bar")
+                    .attr("transform", function(d) {
+                        return "translate(" + x(d.x0) + "," + y2 + ")";
+                    });
+
+                g.append("rect")
+                    .attr("width", function(d) {
+                        return (x(d.x1) - x(d.x0)) - 2;
+                    });
+
+                g.append("text")
+                    .attr("x", x(1 / 40))
+                    .attr("dy", 10)
+                    .attr("dominant-baseline", "hanging")
+                    .attr("text-anchor", "middle");
+
+                bar.select("rect").transition().duration(dt / 4)
+                    .attr("height", function(d) {
+                        return y(d.y / (1 / 20));
+                    });
+
+                bar.select("text")
+                    .text(function(d) {
+                        return d.y > 0 ? d3.format(".0%")(d.y) : "";
+                    });
+
+                svg.select(".line").datum(d3.range(0, 1.05, 0.05).map(function(x) {
+                    return [x, pdfnorm(x)];
+                }))
+                    .transition().duration(dt / 4)
+                    .attr("d", area);
+            }
+
+            function renderBallsBates() {
+                var data = d3.range(n).map(function(d) {
+                    return d3.randomBates(4)()
+                });
+                var mean = d3.mean(data);
+
+                var ball = svg.append("g").selectAll(".ball").data(data);
+
+                var i = 0;
+                ball.enter().append("circle")
+                    .attr("class", "ball")
+                    .attr("cx", function(d) {
+                        return x(d);
+                    })
+                    .attr("cy", 0)
+                    .attr("r", 5)
+                    .transition().duration(dt).ease(d3.easeBounce)
+                    .attr("cy", y1 - 5)
+                    .on("end", function() {
+                        d3.select(this)
+                            .transition().duration(dt / 4)
+                            .attr("cy", (y2 + y1) / 2)
+                            .transition().duration(dt / 4)
+                            .attr("cx", x(mean))
+                            .transition().duration(dt / 4).ease(d3.easeBounce)
+                            .attr("cy", y2 - 3)
+                            .attr("r", 3)
+                            .each(function() {
+                                ++i;
+                            })
+                            .on("end", function() {
+                                if (!--i) {
+                                    counts4.push(mean);
+                                } else {
+                                    d3.select(this).remove();
+                                }
+                            });
+                    });
+            }
+
+            function renderBarsexp() {
+                var data = histogram(counts4)
+                    .map(d => {
+                        d.y = counts4.length > 0 ? d.length / counts4.length : 0;
+                        return d;
+                    })
+                    .filter(d => d.x1 > d.x0);
+
+                var ymax = d3.max(data, function(d) {
+                    return d.y;
+                });
+                y.domain([0, ymax / (1 / 20)]);
+
+                var bar = svg.select(".bars").selectAll(".bar").data(data);
+
+                var g = bar.enter().append("g")
+                    .attr("class", "bar")
+                    .attr("transform", function(d) {
+                        return "translate(" + x(d.x0) + "," + y2 + ")";
+                    });
+
+                g.append("rect")
+                    .attr("width", function(d) {
+                        return (x(d.x1) - x(d.x0)) - 2;
+                    });
+
+                g.append("text")
+                    .attr("x", x(1 / 40))
+                    .attr("dy", 10)
+                    .attr("dominant-baseline", "hanging")
+                    .attr("text-anchor", "middle");
+
+                bar.select("rect").transition().duration(dt / 4)
+                    .attr("height", function(d) {
+                        return y(d.y / (1 / 20));
+                    });
+
+                bar.select("text")
+                    .text(function(d) {
+                        return d.y > 0 ? d3.format(".0%")(d.y) : "";
+                    });
+
+                svg.select(".line").datum(d3.range(0, 1.05, 0.05).map(function(x) {
+                    return [x, pdfnorm(x)];
+                }))
+                    .transition().duration(dt / 4)
+                    .attr("d", area);
+            }
+
+            function renderBallsexp() {
+                var data = d3.range(n).map(function(d) {
+                    return d3.randomExponential(2)()
+                });
+                var mean = d3.mean(data);
+
+                var ball = svg.append("g").selectAll(".ball").data(data);
+
+                var i = 0;
+                ball.enter().append("circle")
+                    .attr("class", "ball")
+                    .attr("cx", function(d) {
+                        return x(d);
+                    })
+                    .attr("cy", 0)
+                    .attr("r", 5)
+                    .transition().duration(dt).ease(d3.easeBounce)
+                    .attr("cy", y1 - 5)
+                    .on("end", function() {
+                        d3.select(this)
+                            .transition().duration(dt / 4)
+                            .attr("cy", (y2 + y1) / 2)
+                            .transition().duration(dt / 4)
+                            .attr("cx", x(mean))
+                            .transition().duration(dt / 4).ease(d3.easeBounce)
+                            .attr("cy", y2 - 3)
+                            .attr("r", 3)
+                            .each(function() {
+                                ++i;
+                            })
+                            .on("end", function() {
+                                if (!--i) {
+                                    counts4.push(mean);
+                                } else {
+                                    d3.select(this).remove();
+                                }
+                            });
+                    });
+            }
+
+
+            function renderAllnorm() {
+                renderBars();
+                renderBalls();
+
+            }
+
+            function renderAllunif() {
+                renderBarsunif();
+                renderBallsunif();
+            }
+
+            function renderAllln() {
+                renderBarsln();
+                renderBallsln();
+            }
+
+            function renderAllBates() {
+                renderBarsBates();
+                renderBallsBates();
+            }
+
+            function renderAllexp() {
+                renderBarsexp();
+                renderBallsexp();
+            }
+
+            function fornorm(){
+                d3.interval(renderAllnorm(), dt);
+            }
+
+            function forunif(){
+                d3.interval(renderAllunif(), dt);
+            }
+
+
+            function forbates(){
+                d3.interval(renderAllBates(), dt);
+            }
+
+            function forln(){
+                d3.interval(renderAllln(), dt);
+            }
+
+            function forexp(){
+                d3.interval(renderAllexp(), dt);
+            }
+
+            function reload() {
+
+                d3.selectAll(".ball").remove();
+                d3.selectAll(".bar rect").transition().duration(dt / 4)
+                    .attr("height", 0);
+                d3.selectAll(".bar text").transition().duration(dt / 4)
+                    .attr("opacity", 0)
+
+                var img = document.getElementById('bigpic');
+                img.style = "display:none";
+
+                n = 0;
+                counts1 = [];
+                counts2 = [];
+                counts3 = [];
+                counts4 = [];
+            }
+
+            function showText() {
+                d3.selectAll(".bar text").transition().duration(dt / 4)
+                    .attr("opacity", 100)
+
+            }
+
+        </script>
+
+
+    </div>
+</body>
